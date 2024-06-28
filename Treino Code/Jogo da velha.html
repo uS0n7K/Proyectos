@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border: 2px solid #000;
+            font-size: 2em;
+            cursor: pointer;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+        .reset-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div class="status"></div>
+        <button class="reset-button">Reiniciar Jogo</button>
+    </div>
+
+    <script>
+        const board = document.querySelector('.board');
+        const cells = document.querySelectorAll('.cell');
+        const statusText = document.querySelector('.status');
+        const resetButton = document.querySelector('.reset-button');
+        let currentPlayer = 'X';
+        let gameState = ["", "", "", "", "", "", "", "", ""];
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function handleCellClick(event) {
+            const cell = event.target;
+            const index = cell.getAttribute('data-index');
+
+            if (gameState[index] !== "" || !checkWin().includes(-1)) {
+                return;
+            }
+
+            gameState[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+
+            if (checkWin().includes(-1)) {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                statusText.textContent = `É a vez de ${currentPlayer}`;
+            } else {
+                const winner = checkWin().find(w => w !== -1);
+                statusText.textContent = `O jogador ${gameState[winner]} venceu!`;
+            }
+
+            if (!gameState.includes("")) {
+                statusText.textContent = `Empate!`;
+            }
+        }
+
+        function checkWin() {
+            return winningConditions.map(condition => {
+                const [a, b, c] = condition;
+                return gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c] ? a : -1;
+            });
+        }
+
+        function resetGame() {
+            gameState = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = 'X';
+            cells.forEach(cell => cell.textContent = "");
+            statusText.textContent = `É a vez de ${currentPlayer}`;
+        }
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        resetButton.addEventListener('click', resetGame);
+
+        statusText.textContent = `É a vez de ${currentPlayer}`;
+    </script>
+</body>
+</html>
